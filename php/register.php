@@ -1,39 +1,41 @@
+
 <?php
-
-	include ("db.php");	
-
-	$msg = "";
 	if(isset($_POST["submit"]))
 	{
-		$name = $_POST["name"];
-		$email = $_POST["email"];
-		$password = $_POST["password"];
-		$msg = "prueba";
-		$name = mysqli_real_escape_string($db, $name);
-		$email = mysqli_real_escape_string($db, $email);
-		$password = mysqli_real_escape_string($db, $password);
-		$password = md5($password);
-		
-		
-		$sql="SELECT Correo FROM CLIENTE WHERE Correo='$email'";
-		$result=mysqli_query($db,$sql);
-		$row=mysqli_fetch_array($result,MYSQLI_ASSOC);
-		if(mysqli_num_rows($result) == 1)
-		{
-			$msg = "Esta dirección de correo no es válida";
+		$hostname_User_Information = "localhost";
+$username_User_Information = "root";
+$password_User_Information = "admin";
+$User_Information = mysqli_connect($hostname_User_Information, $username_User_Information, $password_User_Information) or trigger_error(mysql_error(),E_USER_ERROR); 
+
+		session_start();
+		$Correo = $_POST["email"];
+		$Contrasena = $_POST["password"];
+    if ($Contrasena == $_POST["confirm"]){
+    $ContraMD5 = md5($Contrasena);
+    $Cookie_name = 'usuario';
+		if (!mysqli_select_db($User_Information, "tienda")) {
+    die("Uh oh, couldn't select database");
+}
+
+  $sql = "INSERT INTO customers VALUES ('$Correo', '$ContraMD5', 'Nombre', 'Direccion1', 'Direccion2', 'Ciudad', 'Estado','00000', 'Pais', 'No. Celular')";
+  	
+    if(mysqli_query($User_Information, $sql)){
+		echo "Registro Exitoso";
+    setcookie($Cookie_name, $Correo, (30));
 		}
-		else
-		{
-			$query = mysqli_query($db, "INSERT INTO CLIENTE (Id, Contraseña, Nombre,
-			 Correo, Telefono, Direccion, Ciudad, Estado, CodPostal)VALUES (151697,'$password', '$name', '$email','2131','aaa','bbb','ccc',74311)");
-			if($query)
-			{
-				$msg = "Gracias! Te has registrado con éxito";
-				mysqli_commit($db);//para hacerle update a la base de datos
-			}
-		}
-	}
+			else{
+				echo "La dirección de correo que intentas usar ya está en uso, elige otra o inica sesión. ".mysqli_error($User_Information);
+				}
+		
+  }
+  else{
+    echo "Las contraseñas no coinciden.";
+  }
+  }
+  
+ 
 ?>
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -62,14 +64,7 @@
     </div>
     <div class="main-login main-center">
       <form class="form-horizontal" method="post" action="#">
-        <div class="form-group">
-          <label for="name" class="cols-sm-2 control-label">Nombre</label>
-          <div class="cols-sm-10">
-            <div class="input-group"> <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
-              <input type="text" class="form-control" name="name" id="name"  placeholder="Nombre" required/>
-            </div>
-          </div>
-        </div>
+        
         <div class="form-group">
         <label for="email" class="cols-sm-2 control-label">Correo electrónico</label>
         <div class="cols-sm-10">
@@ -77,14 +72,7 @@
             <input type="email" class="form-control input" name="email" id="email"  placeholder="Email" required/>
           </div>
         </div>
-        <div class="form-group">
-          <label for="username" class="cols-sm-2 control-label">Nombre de usuario</label>
-          <div class="cols-sm-10">
-            <div class="input-group"> <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
-              <input type="text" class="form-control input" name="username" id="username"  placeholder="Nombre de usuario" required/>
-            </div>
-          </div>
-        </div>
+        
         <div class="form-group">
           <label for="password" class="cols-sm-2 control-label">Contraseña</label>
           <div class="cols-sm-10">
@@ -101,6 +89,7 @@
             </div>
           </div>
         </div>
+        
         <div class="form-group ">
           <button type="submit" name="submit" class="btn btn-primary btn-lg btn-block login-button">Registrarte</button>
         </div>

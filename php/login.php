@@ -1,3 +1,38 @@
+<?php
+	if(isset($_POST["submit"]))
+	{
+		$hostname_User_Information = "localhost";
+$username_User_Information = "root";
+$password_User_Information = "admin";
+$User_Information = mysqli_connect($hostname_User_Information, $username_User_Information, $password_User_Information) or trigger_error(mysql_error(),E_USER_ERROR); 
+
+		session_start();
+		$Correo = $_POST["email"];
+		$Contrasena = $_POST["password"];
+		$Contra = md5($Contrasena);
+
+    $Cookie_name = 'usuario';
+		if (!mysqli_select_db($User_Information, "tienda")) {
+    die("Uh oh, couldn't select database");
+}
+
+  $sql = "SELECT email_address, contraseña, complete_name FROM customers where email_address like '". $Correo . "' " .
+  "AND contraseña like '" . $Contra . "'";
+$result = mysqli_query($User_Information, $sql) or die(mysql_error());
+    if (mysqli_num_rows($result) == 1) {
+ while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+ extract($row);
+ echo "Welcome " . $complete_name . " to our Shopping Mall <br>";
+ }
+ }
+			else{
+				echo "Por favor, ingresa una dirección de correo o contraseña válidas".mysqli_error($User_Information);
+				}
+  }
+  
+ 
+?>
+
 <!DOCTYPE html>
 <html>
     <head> 
@@ -14,7 +49,7 @@
 		<link href='https://fonts.googleapis.com/css?family=Passion+One' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
 
-		<title>Admin</title>
+		<title>Log in</title>
 	</head>
 	<body>
 		<div class="container">
@@ -26,13 +61,13 @@
 	               	</div>
 	            </div> 
 				<div class="main-login main-center">
-					
+				      <form class="form-horizontal" method="post" action="#">
+
 						<div class="form-group">
-							<label for="username" class="cols-sm-2 control-label">Nombre de usuario</label>
+							<label for="email" class="cols-sm-2 control-label">Correo electrónico</label>
 							<div class="cols-sm-10">
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
-									<input type="text" class="form-control" name="username" id="username"  placeholder="Nombre de usuario"/>
+								<div class="input-group"><span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+									<input type="text" class="form-control input" name="email" id="email"  placeholder="Correo electrónico" required/>
 								</div>
 							</div>
 						</div>
@@ -48,11 +83,9 @@
 						</div>
 
 						<div class="form-group ">
-							<button type="button" class="btn btn-primary btn-lg btn-block login-button">Iniciar sesión</button>
+          					<button type="submit" name="submit" class="btn btn-primary btn-lg btn-block login-button">Iniciar sesión</button>
 						</div>
-						<div class="login-register">
-				            <a href="register.php">Registrarte</a>
-				         </div>
+						<div class="login-register"> <a href="register.php">Registrarte</a> </div>
 					</form>
 				</div>
 			</div>
