@@ -3,32 +3,52 @@
 	{
 		$hostname_User_Information = "localhost";
 $username_User_Information = "root";
-$password_User_Information = "admin";
-$User_Information = mysqli_connect($hostname_User_Information, $username_User_Information, $password_User_Information) or trigger_error(mysql_error(),E_USER_ERROR); 
+$password_User_Information = "1234";
+$User_Information = mysqli_connect($hostname_User_Information, $username_User_Information, $password_User_Information) or trigger_error(mysqli_error(),E_USER_ERROR); 
 
 		session_start();
+        $Nombre = $_POST["nombre"];
+        $Direccion = $_POST["Direccion"];
+        $Direccion = $_POST["Direccion2"];
+        $Ciudad = $_POST["Ciudad"];
+        $Estado = $_POST["Estado"];
+        $CodigoPostal = $_POST["CodigoPostal"];
+        $Pais = $_POST["Pais"];
 		$Correo = $_POST["email"];
+        $CelNum = $_POST["CelNum"];
 		$Contrasena = $_POST["password"];
-    if ($Contrasena == $_POST["confirm"]){
-    $ContraMD5 = md5($Contrasena);
+        $ContraMD5 = md5($Contrasena);
+        $sql1 = "SELECT contraseña FROM customers WHERE email_address like '". $Correo . "'";
+        
+    if ($ContraMD5 == $sql1){
     $Cookie_name = 'usuario';
 		if (!mysqli_select_db($User_Information, "tienda")) {
     die("Uh oh, couldn't select database");
 }
 
-  $sql = "INSERT INTO customers VALUES ('$Correo', '$ContraMD5', 'Nombre', 'Direccion1', 'Direccion2', 'Ciudad', 'Estado','00000', 'Pais', 'No. Celular')";
-  	
+  $sql = "UPDATE customers SET complete_name = '". $Nombre . "', " .
+    "address_line 1 = '". $Direccion . "', " . 
+    "address_line 2 = '". $Direccion2 . "', " . 
+    "email_address = '". $Correo . "', " . 
+    "contraseña = '". $Contrasena . "', " . 
+    "city = '". $Ciudad . "', " . 
+    "state = '". $Estado . "', " . 
+    "zipcode = '". $CodigoPostal . "', " . 
+  	"cellphone_no = '". $CelNum . "' " . 
+    "WHERE email_address like '". $Correo . "'";
+;
+
     if(mysqli_query($User_Information, $sql)){
-		echo "Registro Exitoso";
+		echo "Actualización Exitosa";
     setcookie($Cookie_name, $Correo, (30));
 		}
 			else{
-				echo "La dirección de correo que intentas usar ya está en uso, elige otra o inica sesión. ".mysqli_error($User_Information);
+				echo "Hubo un error ".mysqli_error($User_Information);
 				}
 		
   }
   else{
-    echo "Las contraseñas no coinciden.";
+    echo "Tu contraseña no coincide, vuelve a intentarlo.".mysqli_error($User_Information);
   }
   }
   
